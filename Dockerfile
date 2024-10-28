@@ -1,5 +1,5 @@
-# Base image with CUDA 12.6.2, cuDNN, and Ubuntu 22.04
-FROM nvidia/cuda:12.6.2-cudnn-devel-ubuntu22.04
+# Base image with CUDA 12.3.2, and Ubuntu 22.04
+FROM nvidia/cuda:12.3.2-devel-ubuntu22.04
 
 # Set environment variables to avoid interactive installations
 ENV DEBIAN_FRONTEND=noninteractive
@@ -25,10 +25,11 @@ RUN apt-get update && \
     git \
     file \
     ocl-icd-opencl-dev \
-    opencl-headers && \
+    nvidia-opencl-icd \
+    opencl-headers \
+    clinfo \
+    && \
     rm -rf /var/lib/apt/lists/*
-
-# install opencl and 
 
 # Clone the deconwolf repository
 RUN mkdir /deconwolf && \
@@ -39,25 +40,21 @@ RUN mkdir /deconwolf && \
 RUN mkdir /deconwolf/builddir && \
     cd /deconwolf/builddir && \
     cmake .. && \
-    cpack -G DEB
-
-# Install the generated DEB package
-RUN cd /deconwolf/builddir && \
-    apt-get install -y ./deconwolf-0.4.3-Linux.deb
+    cmake --build .
 
 # Optional: Clean up build dependencies to reduce image size
-RUN apt-get remove -y \
-        cmake \
-        pkg-config \
-        gcc \
-        libfftw3-dev \
-        libgsl-dev \
-        libomp-dev \
-        libpng-dev \
-        libtiff-dev && \
-    apt-get autoremove -y && \
-    apt-get clean && \
-    rm -rf /deconwolf /var/lib/apt/lists/*
+# RUN apt-get remove -y \
+#         cmake \
+#         pkg-config \
+#         gcc \
+#         libfftw3-dev \
+#         libgsl-dev \
+#         libomp-dev \
+#         libpng-dev \
+#         libtiff-dev && \
+#     apt-get autoremove -y && \
+#     apt-get clean && \
+#     rm -rf /deconwolf /var/lib/apt/lists/*
 
 # Set entrypoint if needed
 # ENTRYPOINT ["/bin/bash"]
