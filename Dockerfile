@@ -25,7 +25,6 @@ RUN apt-get update && \
     git \
     file \
     ocl-icd-opencl-dev \
-    nvidia-opencl-icd \
     opencl-headers \
     clinfo \
     && \
